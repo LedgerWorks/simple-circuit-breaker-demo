@@ -1,0 +1,46 @@
+{
+  "name": "simple-circuit-breaker-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js,.ts",
+    "build:coinflip-circuit-breaker-demo": "esbuild lambdas/coinflip-circuit-breaker-demo/index.ts --bundle --platform=node --target=node18 --outfile=dist/lambda-artifacts/index.js",
+    "clean:lambdas": "rimraf dist/lambda-artifacts function.zip",
+    "coinflip": "node -r esbuild-runner/register cli/program.ts",
+    "deploy:coinflip-circuit-breaker-demo": "lambdas/deploy.sh coinflip-circuit-breaker-demo",
+    "hardhat:compile": "hardhat compile",
+    "hardhat:console": "hardhat console --network ${NETWORK:-hardhat}",
+    "hardhat:deploy": "hardhat run --network ${NETWORK:-hardhat} contracts/deploy.ts",
+    "hardhat:node": "hardhat node",
+    "hardhat:test": "hardhat test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "avalanche": "^3.16.0",
+    "commander": "^10.0.1",
+    "dotenv": "^16.0.3",
+    "esbuild-runner": "^2.2.2",
+    "ethers": "^5.7.2",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@types/chai": "^4.3.5",
+    "@types/typescript": "^2.0.0",
+    "eslint": "^8.40.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "hardhat": "^2.14.0",
+    "rimraf": "^5.0.0"
+  }
+}
