@@ -10,8 +10,8 @@ echo "Updating ${NAME}"
 
 cd "$PROJECT_DIR"
 
-npm run clean:lambdas
-npm run build:${NAME}
+npm run lambda:clean
+npm run lambda:build
 
 cd "dist/lambda-artifacts"
 zip -r ../function.zip ./* ../package.json

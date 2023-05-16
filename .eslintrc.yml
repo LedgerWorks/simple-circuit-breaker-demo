@@ -9,7 +9,7 @@ extends:
   - plugin:@typescript-eslint/recommended
   - prettier
   - plugin:prettier/recommended
-  - plugin:sonarjs/recommended
+  - next/core-web-vitals
 parserOptions:
   project: ./tsconfig-eslint.json
 settings:
@@ -23,13 +23,7 @@ settings:
 plugins:
   - jest
   - prettier
-  - unicorn
 rules:
-  unicorn/filename-case:
-    - error
-    - case: kebabCase
-      ignore:
-        - \.js$
   import/no-extraneous-dependencies:
     - error
     - devDependencies: true # we're using webpack. Ignore devDependency errors
@@ -62,12 +56,6 @@ rules:
 
 overrides:
   - files:
-      - "**/*.test.ts"
-    rules:
-      sonarjs/no-duplicate-string: off
-  - files:
       - "**/*.js"
     rules:
       "@typescript-eslint/no-var-requires": off
-      sonarjs/no-duplicate-string: off
-      sonarjs/no-identical-functions: off
