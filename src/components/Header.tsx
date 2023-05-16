@@ -1,28 +1,18 @@
 import Image from "next/image";
+import { Balance } from "./Balance";
+import "@/styles/flip.css";
 
-export const Header = ({ balance }: { balance: number }) => {
-  const formatAvax = (amount: number): string => {
-    const roundedAmount = Math.round((amount + Number.EPSILON) * 1000) / 1000;
-    const fixedAmount = roundedAmount.toFixed(3);
-    return fixedAmount.toString();
-  };
+export const Header = () => {
   return (
     <div className="flex w-full flex-row items-start justify-between gap-4">
       <div className="flex flex-row items-center gap-4">
-        <Image src="/avax-token.svg" alt="Avax Coin" width={60} height={60} priority />
-        <h1 className="text-4xl">Avax Coin Flip</h1>
+        <Image src="/avax-coin.svg" alt="AVAX Coin" width={60} height={60} priority />
+        <h1 className="text-4xl">AVAX Coin Flip</h1>
       </div>
-      <div className="flex flex-row items-end gap-2">
-        <Image
-          src="/wallet.svg"
-          alt="wallet"
-          className="dark:invert"
-          width={24}
-          height={24}
-          priority
-        />
-        <div>{formatAvax(balance ?? 0)}</div>
-        <Image src="/avalanche-icon.svg" alt="wallet" width={16} height={16} priority />
+      <div className="flex flex-row items-end gap-2 text-md">
+        <Image src="/wallet.svg" alt="wallet" width={24} height={24} priority />
+        <Balance />
+        <Image src="/avax-icon.svg" alt="Avax icon" width={20} height={20} priority />
       </div>
     </div>
   );

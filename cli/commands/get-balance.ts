@@ -15,5 +15,3 @@ export const register = (): void => {
     .description("Gets a the contract's balance")
     .action(() => wrapAction(getBalance));
 };
-
-export default { register };

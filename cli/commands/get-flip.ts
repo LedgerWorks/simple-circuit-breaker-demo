@@ -1,16 +1,16 @@
 import { program } from "commander";
 import wrapAction from "../wrap-action";
-import { getEnv } from "../../common/env";
 import { getContractForAdmin } from "../../common/ethers-helpers";
+import { getPlayerAddress } from "../../common/env";
 
 export const getFlip = async (index: number) => {
   const contract = getContractForAdmin();
-  const { COINFLIP_PLAYER_ADDRESS } = getEnv();
+  const playerAddress = getPlayerAddress();
   const flipIndex =
     index < 0 || Number.isNaN(index)
-      ? (await contract.getCurrentFlipIndex(COINFLIP_PLAYER_ADDRESS)).toNumber()
+      ? (await contract.getCurrentFlipIndex(playerAddress)).toNumber()
       : index;
-  const flip = await contract.getFlip(COINFLIP_PLAYER_ADDRESS, flipIndex);
+  const flip = await contract.getFlip(playerAddress, flipIndex);
   console.log({ flipIndex, ...flip });
 };
 
@@ -23,5 +23,3 @@ export const register = (): void => {
       return wrapAction(getFlip, parseInt(`${index}`, 10));
     });
 };
-
-export default { register };

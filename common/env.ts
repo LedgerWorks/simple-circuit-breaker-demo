@@ -1,15 +1,6 @@
 import dotenv from "dotenv";
 
-export type Env = {
-  RPC_HOST: string;
-  COINFLIP_CONTRACT_ADDRESS: string;
-  COINFLIP_ADMIN_ADDRESS: string;
-  COINFLIP_ADMIN_KEY: string;
-  COINFLIP_PLAYER_ADDRESS: string;
-  COINFLIP_PLAYER_KEY: string;
-};
-
-export const chainId = 43113;
+dotenv.config();
 
 export const getRequired = (key: string): string => {
   const value = `${process.env[key]}`;
@@ -19,18 +10,15 @@ export const getRequired = (key: string): string => {
   return value;
 };
 
-let env: Env | undefined;
-export const getEnv = (): Env => {
-  if (!env) {
-    dotenv.config();
-    env = {
-      RPC_HOST: getRequired("RPC_HOST"),
-      COINFLIP_CONTRACT_ADDRESS: getRequired("COINFLIP_CONTRACT_ADDRESS"),
-      COINFLIP_ADMIN_ADDRESS: getRequired("COINFLIP_ADMIN_ADDRESS"),
-      COINFLIP_ADMIN_KEY: getRequired("COINFLIP_ADMIN_KEY"),
-      COINFLIP_PLAYER_ADDRESS: getRequired("COINFLIP_PLAYER_ADDRESS"),
-      COINFLIP_PLAYER_KEY: getRequired("COINFLIP_PLAYER_KEY"),
-    };
-  }
-  return env;
+export const getOptional = (key: string, defaultValue?: string): string | undefined => {
+  const value = `${process.env[key]}`;
+  return value ?? defaultValue;
 };
+
+export const getChainId = (): number => parseInt(getRequired("CHAIN_ID"), 10);
+export const getRpcHost = (): string => getRequired("RPC_HOST");
+export const getContractAddress = (): string => getRequired("COINFLIP_CONTRACT_ADDRESS");
+export const getAdminAddress = (): string => getRequired("COINFLIP_ADMIN_ADDRESS");
+export const getAdminKey = (): string => getRequired("COINFLIP_ADMIN_KEY");
+export const getPlayerAddress = (): string => getRequired("COINFLIP_PLAYER_ADDRESS");
+export const getPlayerKey = (): string => getRequired("COINFLIP_PLAYER_KEY");

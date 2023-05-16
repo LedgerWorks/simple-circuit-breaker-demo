@@ -32,11 +32,10 @@ contract CoinFlip {
   }
 
   enum FlipStatus {
-    Uninitialized,
-    WagerPlaced,
-    Flipped,
-    PayoutReconciled,
-    Error
+    Ready,
+    Loser,
+    Winner,
+    Reconciled
   }
 
   struct Flip {
@@ -44,63 +43,81 @@ contract CoinFlip {
     Side calledSide;
     uint256 wagerAmount;
     uint256 flipFee;
+    uint256 payoutAmount;
     Side flipResult;
   }
 
   struct Player {
     mapping(uint => Flip) flips;
     uint currentFlip;
-    bool banned;
   }
 
   // constants
   uint256 private constant _oneEther = 1000000000000000000;
+  uint256 public constant minWager = _oneEther / 100;
+  uint256 public constant maxWager = _oneEther;
+  uint256 public constant feeBasePoints = 350;
 
   // properties
   address payable owner;
-  uint256 minWager;
-  uint256 maxWager;
-  uint256 feeBasePoints;
   bool public disabled;
   mapping(address => Player) players;
 
   // constructor
   constructor() {
     owner = payable(msg.sender);
-    minWager = _oneEther / 100;
-    maxWager = _oneEther;
-    feeBasePoints = 350;
     disabled = false;
   }
 
   receive() external payable {}
 
   // access modifiers
-  modifier onlyOwner() {
+  modifier admin() {
     require(msg.sender == owner, "Unauthorized");
     _;
   }
 
-  modifier onlyPlayers(FlipStatus allowedStatus) {
+  modifier enabled() {
     require(!disabled, "The game is currently disabled.");
-    require(!players[msg.sender].banned, "You are currently banned!");
-    Player storage player = players[msg.sender];
-    Flip storage currentFlip = player.flips[player.currentFlip];
-    require(
-      currentFlip.status == allowedStatus,
-      "Your current flip status does not allow that action."
-    );
     _;
   }
 
-  // internal functions
-  function calculateFee(uint256 _amount, uint256 _feeBasePoints) internal pure returns (uint256) {
-    return (_amount * _feeBasePoints) / 10_000;
+  // game functions
+  function flip(Side _calledSide, uint _timestamp) public payable enabled {
+    uint256 wagerAmount = msg.value;
+    require(wagerAmount >= minWager, "Wager amount too small.");
+    require(wagerAmount <= maxWager, "Wager amount too large.");
+    Player storage player = players[msg.sender];
+    Flip storage currentFlip = player.flips[player.currentFlip];
+    require(
+      currentFlip.status == FlipStatus.Ready,
+      "Your current flip status does not allow this action."
+    );
+    currentFlip.calledSide = _calledSide;
+    currentFlip.wagerAmount = wagerAmount;
+    currentFlip.flipFee = calculateFee(currentFlip);
+    currentFlip.payoutAmount = calculatePayout(currentFlip);
+    Side flipResult = doFlip(_timestamp);
+    currentFlip.flipResult = flipResult;
+    if (currentFlip.calledSide == currentFlip.flipResult) {
+      currentFlip.status = FlipStatus.Winner;
+    } else {
+      currentFlip.status = FlipStatus.Loser;
+    }
   }
 
-  function doFlip(uint256 _timestamp) internal pure returns (Side) {
-    bool isEven = _timestamp % 2 == 0;
-    return isEven ? Side.Heads : Side.Tails;
+  function collect() public enabled {
+    Player storage player = players[msg.sender];
+    Flip storage currentFlip = player.flips[player.currentFlip];
+    require(
+      currentFlip.status == FlipStatus.Winner,
+      "Your current flip status does not allow this action."
+    );
+    uint256 balance = getBalance();
+    require(balance > currentFlip.payoutAmount, "The game has insufficient funds.");
+    (bool success, ) = payable(msg.sender).call{value: currentFlip.payoutAmount}("");
+    require(success, "Failed to reconcile payout");
+    currentFlip.status = FlipStatus.Reconciled;
   }
 
   // public getters
@@ -117,101 +134,39 @@ contract CoinFlip {
   }
 
   function getCurrentFlip(address _player) public view returns (Flip memory) {
-    Player storage playerState = players[_player];
-    return playerState.flips[playerState.currentFlip];
-  }
-
-  function isBanned(address _player) public view returns (bool) {
-    return players[_player].banned;
-  }
-
-  function isWinner(address _player) public view returns (bool) {
     Player storage player = players[_player];
-    Flip storage currentFlip = player.flips[player.currentFlip];
-    return
-      currentFlip.calledSide != Side.Uninitialized &&
-      currentFlip.flipResult != Side.Uninitialized &&
-      currentFlip.calledSide == currentFlip.flipResult;
-  }
-
-  // game functions
-  function wager(Side _calledSide) public payable onlyPlayers(FlipStatus.Uninitialized) {
-    uint256 wagerAmount = msg.value;
-    require(wagerAmount >= minWager, "Wager amount too small.");
-    require(wagerAmount <= maxWager, "Wager amount too large.");
-    Player storage player = players[msg.sender];
-    Flip storage currentFlip = player.flips[player.currentFlip];
-    currentFlip.calledSide = _calledSide;
-    currentFlip.wagerAmount = wagerAmount;
-    currentFlip.flipFee = calculateFee(wagerAmount, feeBasePoints);
-    currentFlip.status = FlipStatus.WagerPlaced;
-  }
-
-  function flip(uint _timestamp) public onlyPlayers(FlipStatus.WagerPlaced) {
-    Player storage player = players[msg.sender];
-    Flip storage currentFlip = player.flips[player.currentFlip];
-    Side flipResult = doFlip(_timestamp);
-    currentFlip.flipResult = flipResult;
-    currentFlip.status = FlipStatus.Flipped;
-  }
-
-  function collect() public onlyPlayers(FlipStatus.Flipped) {
-    Player storage playerState = players[msg.sender];
-    Flip storage currentFlip = playerState.flips[playerState.currentFlip];
-    require(currentFlip.calledSide == currentFlip.flipResult, "You did not win that coin flip.");
-    uint256 payoutAmount = (currentFlip.wagerAmount * 2) - currentFlip.flipFee;
-    (bool success, ) = payable(msg.sender).call{value: payoutAmount}("");
-    require(success, "Failed to reconcile payout");
-    currentFlip.status = FlipStatus.PayoutReconciled;
-    playerState.currentFlip++;
+    return player.flips[player.currentFlip];
   }
 
   // admin functions
-  function withdraw(uint256 _amount) public onlyOwner {
+  function withdraw(uint256 _amount) public admin {
     (bool success, ) = owner.call{value: _amount}("");
     require(success, "Failed to transfer");
   }
 
-  function withdrawAll() public onlyOwner {
-    uint256 amount = address(this).balance;
-    (bool success, ) = owner.call{value: amount}("");
-    require(success, "Failed to transfer");
-  }
-
-  function setMinWager(uint256 _minWager) public onlyOwner {
-    minWager = _minWager;
-  }
-
-  function setMaxWager(uint256 _maxWager) public onlyOwner {
-    maxWager = _maxWager;
-  }
-
-  function setFeeBasePoints(uint256 _feeBasePoints) public onlyOwner {
-    feeBasePoints = _feeBasePoints;
-  }
-
-  function disable() public onlyOwner {
+  function disable() public admin {
     disabled = true;
   }
 
-  function enable() public onlyOwner {
+  function enable() public admin {
     disabled = false;
   }
 
-  function banPlayer(address _player) public onlyOwner {
-    players[_player].banned = true;
-  }
-
-  function unbanPlayer(address _player) public onlyOwner {
-    players[_player].banned = false;
-  }
-
-  function incrementCurrentFlip(address _player) public onlyOwner {
+  function incrementCurrentFlip(address _player) public admin {
     players[_player].currentFlip++;
   }
 
-  function overrideFlipStatus(address _player, FlipStatus _status) public onlyOwner {
-    Player storage playerState = players[_player];
-    playerState.flips[playerState.currentFlip].status = _status;
+  // internal functions
+  function calculateFee(Flip memory _flip) internal pure returns (uint256) {
+    return (_flip.wagerAmount * feeBasePoints) / 10_000;
+  }
+
+  function calculatePayout(Flip memory _flip) internal pure returns (uint256) {
+    return (_flip.wagerAmount * 2) - _flip.flipFee;
+  }
+
+  function doFlip(uint256 _timestamp) internal pure returns (Side) {
+    bool isEven = _timestamp % 2 == 0;
+    return isEven ? Side.Heads : Side.Tails;
   }
 }

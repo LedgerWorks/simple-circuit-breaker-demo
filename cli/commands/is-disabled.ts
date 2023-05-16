@@ -4,8 +4,8 @@ import { getContractForAdmin } from "../../common/ethers-helpers";
 
 export const isDisabled = async () => {
   const contract = getContractForAdmin();
-  const isDisabled = await contract.disabled();
-  console.log({ isDisabled });
+  const disabled = await contract.disabled();
+  console.log({ isDisabled: disabled });
 };
 
 export const register = (): void => {
@@ -14,5 +14,3 @@ export const register = (): void => {
     .description("Returns whether the game is currently disabled")
     .action(() => wrapAction(isDisabled));
 };
-
-export default { register };

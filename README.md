@@ -1,6 +1,7 @@
 # Simple Circuit-Breaker Demo
 
 ## Initial Setup
+
 The following environment variables need to be added to your `.env` file:
 
 - `RPC_HOST`
@@ -11,31 +12,30 @@ The following environment variables need to be added to your `.env` file:
 - `COINFLIP_PLAYER_KEY`
 
 ## /cli
+
 A CLI wrapper around the CoinFlip exploitable smart contract
 
-| Command     | Args                       | Access | Payable | View |
-| ----------- | -------------------------- | :----: | :-----: | :--: |
-| deposit     | `<amount>`                 |  all   |   ✅    |  ❌  |
-| withdraw    | `<amount>`                 | owner  |   ❌    |  ❌  |
-| disable     |                            | owner  |   ❌    |  ❌  |
-| enable      |                            | owner  |   ❌    |  ❌  |
-| ban         |                            | owner  |   ❌    |  ❌  |
-| unban       |                            | owner  |   ❌    |  ❌  |
-| wager       | `<called_side>` `<amount>` | player |   ✅    |  ❌  |
-| flip        | `<timestamp>`              | player |   ❌    |  ❌  |
-| collect     |                            | player |   ❌    |  ❌  |
-| get-balance |                            |  all   |   ❌    |  ✅  |
-| get-flip    | `[flip_index]`             |  all   |   ❌    |  ✅  |
-| is-banned   |                            |  all   |   ❌    |  ✅  |
-| is-disabled |                            |  all   |   ❌    |  ✅  |
-| is-winner   |                            |  all   |   ❌    |  ✅  |
-|             |                            |        |         |      |
+| Command     | Args                                     | Access | Payable | View |
+| ----------- | ---------------------------------------- | :----: | :-----: | :--: |
+| deposit     | `<amount>`                               |  all   |   ✅    |  ❌  |
+| withdraw    | `<amount>`                               | owner  |   ❌    |  ❌  |
+| disable     |                                          | owner  |   ❌    |  ❌  |
+| enable      |                                          | owner  |   ❌    |  ❌  |
+| flip        | `<called_side>` `<amount>` `<timestamp>` | player |   ✅    |  ❌  |
+| collect     |                                          | player |   ❌    |  ❌  |
+| get-balance |                                          |  all   |   ❌    |  ✅  |
+| get-flip    | `[flip_index]`                           |  all   |   ❌    |  ✅  |
+| is-disabled |                                          |  all   |   ❌    |  ✅  |
+|             |                                          |        |         |      |
 
 ## /contracts
+
 The Solidity code for the CoinFlip exploitable smart contract
 
 ## /lambdas
+
 The Node.js Lambda code for the circuit breaker switch
 
 ## /src
+
 The static website code for the CoinFlip demo game

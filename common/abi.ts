@@ -1,25 +1,8 @@
-const internalTypeEnumFlipStatus = "enum CoinFlip.FlipStatus";
-const internalTypeEnumSide = "enum CoinFlip.Side";
-const internalTypeStructFlip = "struct CoinFlip.Flip";
-
 const CONTRACT_ABI = [
   {
     inputs: [],
     stateMutability: "nonpayable",
     type: "constructor",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_player",
-        type: "address",
-      },
-    ],
-    name: "banPlayer",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [],
@@ -56,7 +39,25 @@ const CONTRACT_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "feeBasePoints",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
+      {
+        internalType: "enum CoinFlip.Side",
+        name: "_calledSide",
+        type: "uint8",
+      },
       {
         internalType: "uint256",
         name: "_timestamp",
@@ -65,7 +66,7 @@ const CONTRACT_ABI = [
     ],
     name: "flip",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -94,12 +95,12 @@ const CONTRACT_ABI = [
       {
         components: [
           {
-            internalType: internalTypeEnumFlipStatus,
+            internalType: "enum CoinFlip.FlipStatus",
             name: "status",
             type: "uint8",
           },
           {
-            internalType: internalTypeEnumSide,
+            internalType: "enum CoinFlip.Side",
             name: "calledSide",
             type: "uint8",
           },
@@ -114,12 +115,17 @@ const CONTRACT_ABI = [
             type: "uint256",
           },
           {
-            internalType: internalTypeEnumSide,
+            internalType: "uint256",
+            name: "payoutAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "enum CoinFlip.Side",
             name: "flipResult",
             type: "uint8",
           },
         ],
-        internalType: internalTypeStructFlip,
+        internalType: "struct CoinFlip.Flip",
         name: "",
         type: "tuple",
       },
@@ -164,12 +170,12 @@ const CONTRACT_ABI = [
       {
         components: [
           {
-            internalType: internalTypeEnumFlipStatus,
+            internalType: "enum CoinFlip.FlipStatus",
             name: "status",
             type: "uint8",
           },
           {
-            internalType: internalTypeEnumSide,
+            internalType: "enum CoinFlip.Side",
             name: "calledSide",
             type: "uint8",
           },
@@ -184,12 +190,17 @@ const CONTRACT_ABI = [
             type: "uint256",
           },
           {
-            internalType: internalTypeEnumSide,
+            internalType: "uint256",
+            name: "payoutAmount",
+            type: "uint256",
+          },
+          {
+            internalType: "enum CoinFlip.Side",
             name: "flipResult",
             type: "uint8",
           },
         ],
-        internalType: internalTypeStructFlip,
+        internalType: "struct CoinFlip.Flip",
         name: "",
         type: "tuple",
       },
@@ -211,124 +222,29 @@ const CONTRACT_ABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_player",
-        type: "address",
-      },
-    ],
-    name: "isBanned",
+    inputs: [],
+    name: "maxWager",
     outputs: [
       {
-        internalType: "bool",
+        internalType: "uint256",
         name: "",
-        type: "bool",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_player",
-        type: "address",
-      },
-    ],
-    name: "isWinner",
+    inputs: [],
+    name: "minWager",
     outputs: [
       {
-        internalType: "bool",
+        internalType: "uint256",
         name: "",
-        type: "bool",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_player",
-        type: "address",
-      },
-      {
-        internalType: internalTypeEnumFlipStatus,
-        name: "_status",
-        type: "uint8",
-      },
-    ],
-    name: "overrideFlipStatus",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_feeBasePoints",
-        type: "uint256",
-      },
-    ],
-    name: "setFeeBasePoints",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_maxWager",
-        type: "uint256",
-      },
-    ],
-    name: "setMaxWager",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_minWager",
-        type: "uint256",
-      },
-    ],
-    name: "setMinWager",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_player",
-        type: "address",
-      },
-    ],
-    name: "unbanPlayer",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: internalTypeEnumSide,
-        name: "_calledSide",
-        type: "uint8",
-      },
-    ],
-    name: "wager",
-    outputs: [],
-    stateMutability: "payable",
     type: "function",
   },
   {
@@ -340,13 +256,6 @@ const CONTRACT_ABI = [
       },
     ],
     name: "withdraw",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "withdrawAll",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

@@ -14,9 +14,7 @@ npm run lambda:clean
 npm run lambda:build
 
 cd "dist/lambda-artifacts"
-zip -r ../function.zip ./* ../package.json
-
-cd "$PROJECT_DIR"
+zip -r ./function.zip ./* ../../package.json
 
 aws lambda update-function-code \
   --function-name ${NAME} \

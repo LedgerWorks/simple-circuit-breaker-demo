@@ -21,5 +21,3 @@ export const register = (): void => {
     .argument("<amount>", "The amount of AVAX to withdraw")
     .action((amount: string) => wrapAction(withdraw, ethers.utils.parseEther(amount)));
 };
-
-export default { register };

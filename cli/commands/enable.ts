@@ -22,5 +22,3 @@ export const register = (): void => {
       return wrapAction(enable);
     });
 };
-
-export default { register };

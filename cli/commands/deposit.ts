@@ -2,8 +2,8 @@
 import { ethers, BigNumber } from "ethers";
 import { program } from "commander";
 import wrapAction from "../wrap-action";
-import { chainId, getEnv } from "../../common/env";
 import { getAvalancheCChain, getAdminWallet, getProvider } from "../../common/ethers-helpers";
+import { getChainId, getContractAddress } from "../../common/env";
 
 type TransactionOptions = {
   nonce: any;
@@ -66,14 +66,15 @@ const calcFeeData = async (
 
 export const deposit = async (amount: BigNumber, options: TransactionOptions) => {
   const provider = getProvider();
-  const { COINFLIP_CONTRACT_ADDRESS } = getEnv();
+  const chainId = getChainId();
+  const contractAddress = getContractAddress();
 
   const nonce = await getNonce(options);
   const { maxFeePerGas, maxPriorityFeePerGas } = await calcFeeData(options);
 
   const tx: any = {
     type: 2,
-    to: COINFLIP_CONTRACT_ADDRESS,
+    to: contractAddress,
     value: amount,
     chainId,
     nonce,
@@ -110,5 +111,3 @@ export const register = (): void => {
       return wrapAction(deposit, ethers.utils.parseEther(amount), options);
     });
 };
-
-export default { register };

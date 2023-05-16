@@ -2,7 +2,7 @@ import { program } from "commander";
 import wrapAction from "../wrap-action";
 import { getContractForPlayer } from "../../common/ethers-helpers";
 
-export const collect = async () => {
+const collect = async () => {
   const contract = getContractForPlayer();
   console.log("Sending transaction");
   const tx = await contract.collect();
@@ -16,8 +16,6 @@ export const collect = async () => {
 export const register = (): void => {
   program
     .command("collect")
-    .description("Collect the payout from a successful coin flip.")
+    .description("Collect payout if a winner.")
     .action(() => wrapAction(collect));
 };
-
-export default { register };
